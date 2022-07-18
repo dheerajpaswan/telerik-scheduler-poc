@@ -1,12 +1,14 @@
 //https://www.telerik.com/kendo-react-ui/components/layout/tabstrip/ -- to implement tab strip
 
-import * as React from "react";
+import React,{useState} from "react";
 import { Dialog } from "@progress/kendo-react-dialogs";
 import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Checkbox, Input, NumericTextBox } from "@progress/kendo-react-inputs";
 import { ComboBox, DropDownList } from "@progress/kendo-react-dropdowns";
 import { Error, Label } from "@progress/kendo-react-labels";
 import { DatePicker, TimePicker } from "@progress/kendo-react-dateinputs";
+import { TabStrip, TabStripTab } from "@progress/kendo-react-layout";
+
 
 //min number validation functions for form
 // const minValueValidator = (value) =>
@@ -40,9 +42,19 @@ import { DatePicker, TimePicker } from "@progress/kendo-react-dateinputs";
 
 const InterstitialForm = (props) => {
   const [value, setValue] = React.useState(0);
-  const alternateLanguageData = [];
-  const alternateLanguageSID = [];
 
+  //for the tabbar
+  const [selected,setSelected] = useState(-1);
+  const handleSelect = (e) => {
+    setSelected(e.selected);
+  }
+  
+
+  const handleSubmit = (e) => {
+    console.log(props);
+    props.onSubmit();
+    console.log(e);
+  }
   //   props.languages.map((language, index) => {
   //     alternateLanguageData.push(language.Description);
   //     alternateLanguageSID.push(language.SID);
@@ -61,8 +73,8 @@ const InterstitialForm = (props) => {
       <Dialog
         title={props.item.SID !== 0 ? "Update" : " Create"}
         onClose={props.cancelEdit}
-        width={1000}
-        height={500}
+        width={1400}
+        height={700}
       >
         <Form
           onSubmit={props.onSubmit}
@@ -70,27 +82,61 @@ const InterstitialForm = (props) => {
           render={(formRenderProps) => (
             <FormElement>
               <div className="row">
-                <div className="col-10">
+                <div className="col-11">
                   <fieldset className={"k-form-fieldset"}>
                     <div className="row">
-                      <div className="mb-3 col-6">
+                      <div className="col-6">
                         <Field
                           name={"Description"}
                           component={Input}
                           label={"Title"}
                         />
                       </div>
-                      <div className="mb-3 col-6">
-                        {/* checkboxes to impliment */}
-                        <Field
-                          name={"ExternalDescription"}
-                          component={Input}
-                          label={"External Description"}
-                        />
+                      <div className="col-6">
+                        {/* checkboxes to impliment & implement valid days pending*/}
+                        <div className="row" style={{marginTop: "20px" , marginBottom:"0px"}}>
+                          <div className="col-3" style={{marginLeft:"5px"}}><Field
+                          name={"SelectAll"}
+                          component={Checkbox}
+                          label={"Select All"}
+                        /></div>
+                        <div className="col-1"><Field
+                          name={"Sun"}
+                          component={Checkbox}
+                          label={"Sun"}
+                        /></div><div className="col-1"><Field
+                        name={"Mon"}
+                        component={Checkbox}
+                        label={"Mon"}
+                      /></div><div className="col-1"><Field
+                      name={"Tues"}
+                      component={Checkbox}
+                      label={"Tues"}
+                    /></div><div className="col-1"><Field
+                    name={"Wed"}
+                    component={Checkbox}
+                    label={"Wed"}
+                  /></div>
+                  <div className="col-1"><Field
+                          name={"Thur"}
+                          component={Checkbox}
+                          label={"Thur"}
+                        /></div>
+                        <div className="col-1"><Field
+                          name={"Fri"}
+                          component={Checkbox}
+                          label={"Fri"}
+                        /></div>
+                        <div className="col-1"><Field
+                          name={"Sat"}
+                          component={Checkbox}
+                          label={"Sat"}
+                        /></div>
+                        </div>
                       </div>
                     </div>
                     <div className="row">
-                      <div className="mb-3 col-6">
+                      <div className=" col-6">
                         <Field
                           name={"ShortTitle"}
                           component={Input}
@@ -99,7 +145,7 @@ const InterstitialForm = (props) => {
                       </div>
                     </div>
                     <div className="row">
-                      <div className="mb-3 col-6">
+                      <div className="col-6">
                         <div className="row">
                           <div className="col-4">
                             <Field
@@ -119,7 +165,7 @@ const InterstitialForm = (props) => {
                           <button
                             //   type={"submit"}
                             className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary col-3"
-                            style={{ marginTop: "20px" }}
+                            style={{ marginTop: "20px" ,marginLeft:"10px" }}
                             //   disabled={!formRenderProps.allowSubmit}
                           >
                             Create Content
@@ -138,7 +184,7 @@ const InterstitialForm = (props) => {
                           </div>
                           <div className="col-6">
                             <Field
-                              name={"AssetID"}
+                              name={"HouseNumber"}
                               component={Input}
                               label={"Asset ID"}
                             />
@@ -160,16 +206,17 @@ const InterstitialForm = (props) => {
                           </div>
                           <div className="col-4">
                             <Field
-                              name={"ValidToDate"}
+                              name={"ExpiryDate"}
                               component={DatePicker}
                               label={"Valid To"}
                             />
                           </div>
-                          <div className="col-4">
+                          <div className="col-4" style={{marginTop: "25px" , marginBottom:"0px"}}>
                             <Field
                               name={"TBA"}
                               component={Checkbox}
                               label={"TBA"}
+                              // marginTop={"400px"}
                             />
                           </div>
                         </div>
@@ -185,7 +232,7 @@ const InterstitialForm = (props) => {
                           </div>
                           <div className="col-6">
                             <Field
-                              name={"ISCICode"}
+                              name={"BroadCasterID"}
                               component={Input}
                               label={"ISCI Code"}
                             />
@@ -216,14 +263,14 @@ const InterstitialForm = (props) => {
                         <div className="row">
                           <div className="col-6">
                             <Field
-                              name={"InTime"}
+                              name={"StartTime"}
                               component={TimePicker}
                               label={"In Time"}
                             />
                           </div>
                           <div className="col-6">
                             <Field
-                              name={"OutTime"}
+                              name={"EndTime"}
                               component={TimePicker}
                               label={"Out Time"}
                             />
@@ -236,14 +283,14 @@ const InterstitialForm = (props) => {
                         <div className="row">
                           <div className="col-4">
                             <Field
-                              name={"Production"}
+                              name={"ProductionYear"}
                               component={Input}
                               label={"Production"}
                             />
                           </div>
-                          <div className="col-4">
+                          <div className="col-4" style={{marginTop: "25px" , marginBottom:"0px"}}>
                             <Field
-                              name={"Archive"}
+                              name={"Available"}
                               component={Checkbox}
                               label={"Archive"}
                             />
@@ -259,9 +306,9 @@ const InterstitialForm = (props) => {
                               label={"Actual Duration"}
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-6" style={{marginTop: "25px" , marginBottom:"0px"}}>
                             <Field
-                              name={"TXReady"}
+                              name={"Previewed"}
                               component={Checkbox}
                               label={"TX Ready"}
                             />
@@ -300,9 +347,129 @@ const InterstitialForm = (props) => {
                         </div>
                       </div>
                     </div>
+                    {/* tab element */}
+                    <div style={{marginTop:"10px" ,marginBottom:"10px"}}>
+                    <TabStrip selected={selected} onSelect={handleSelect}>
+                        <TabStripTab title="Media Episode Technical Detail">
+                          <div className="row">
+                            <div className="col-6">
+                            <Field
+                          name={"DeliveryMethod"}
+                          component={Input}
+                          label={"Delivery Method"}
+                        /></div>
+                            <div className="col-4"><Field
+                          name={"VideoAspectRatio"}
+                          component={Input}
+                          label={"Video Aspect Ratio"}
+                        /></div>
+                            <div className="col-2"><Field
+                          name={"Ratio"}
+                          component={Input}
+                          label={"Ratio"}
+                        /> </div>
+                          </div>
+                          <div className="row">
+                            <div className="col-6">
+                            <Field
+                          name={"OriginalLanguages"}
+                          component={Input}
+                          label={"Original Languages"}
+                        /></div>
+                            <div className="col-6"><Field
+                          name={"VideoCodec"}
+                          component={Input}
+                          label={"Video Codec"}
+                        /> </div>
+                          </div>
+                           <div className="row">
+                            <div className="col-6">
+                            <Field
+                          name={"DubbedLanguages"}
+                          component={Input}
+                          label={"Dubbed Languages"}
+                        /></div>
+                            <div className="col-6"><Field
+                          name={"Ratio"}
+                          component={Input}
+                          label={"Ratio"}
+                        /> </div>
+                          </div>
+                          
+                        </TabStripTab>
+                        <TabStripTab title="Rights">
+                        <div className="row">
+                            <div className="col-6">
+                            <Field
+                          name={"DeliveryMethod"}
+                          component={Input}
+                          label={"Delivery Method"}
+                        /></div>
+                            <div className="col-4"><Field
+                          name={"VideoAspectRatio"}
+                          component={Input}
+                          label={"Video Aspect Ratio"}
+                        /></div>
+                            <div className="col-2"><Field
+                          name={"Ratio"}
+                          component={Input}
+                          label={"Ratio"}
+                        /> </div>
+                          </div>
+                          <div className="row">
+                            <div className="col-6">
+                            <Field
+                          name={"OriginalLanguages"}
+                          component={Input}
+                          label={"Original Languages"}
+                        /></div>
+                            <div className="col-6"><Field
+                          name={"VideoCodec"}
+                          component={Input}
+                          label={"Video Codec"}
+                        /> </div>
+                          </div>
+                           <div className="row">
+                            <div className="col-6">
+                            <Field
+                          name={"DubbedLanguages"}
+                          component={Input}
+                          label={"Dubbed Languages"}
+                        /></div>
+                            <div className="col-6"><Field
+                          name={"Ratio"}
+                          component={Input}
+                          label={"Ratio"}
+                        /> </div>
+                          </div>
+                          
+                        </TabStripTab>
+                        <TabStripTab title="Synopsis">
+                       <p>tab3</p>
+                        </TabStripTab>
+                        <TabStripTab title="Audio Track Detail">
+                          <p>Tab 3 Content</p>
+                        </TabStripTab>
+                        <TabStripTab title="Attachments">
+                          <p>Tab 3 Content</p>
+                        </TabStripTab>
+                        <TabStripTab title="Cast & Crew">
+                          <p>Tab 3 Content</p>
+                        </TabStripTab>
+                        <TabStripTab title="Rules">
+                          <p>Tab 3 Content</p>
+                        </TabStripTab>
+                        <TabStripTab title="Media">
+                          <p>Tab 3 Content</p>
+                        </TabStripTab>
+                        <TabStripTab title="Mam Status">
+                          <p>Tab 3 Content</p>
+                        </TabStripTab>
+                    </TabStrip>
+                  </div>
                   </fieldset>
                 </div>
-                <div className="k-form-buttons col-2">
+                <div className="k-form-buttons col-1">
                   <div className="row">
                     <button
                       type={"submit"}
@@ -321,7 +488,7 @@ const InterstitialForm = (props) => {
                     </button>
                     <button
                       // type={"submit"}
-                      style={{ marginBottom: "240px", marginTop: "5px" }}
+                      style={{ marginBottom: "480px", marginTop: "5px" }}
                       className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base col-12"
                     >
                       History

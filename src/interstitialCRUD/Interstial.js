@@ -27,13 +27,38 @@ const EditCommandCell = (props) => {
 const Interstial = () => {
   const initialValues = {
     SID: 0,
-    Code: "",
-    Description: "",
-    ExternalDescription: "",
-    AlternateDescription: "",
-    AltDescriptionLanguageSID: "",
-    InActive: 0,
-    Archive: 0,
+    Description: " ",
+    ShortTitle: " ",
+    ValidFromDate: " ",
+    ExpiryDate: " ",
+    TBA: false,
+    GenreSID : 2,
+    SubGenreSID : 3,
+    ProductionYear: 0,
+    Available: false,
+    MediaCategorySID: 2,
+    ContentSID : 2,
+    MediaCategoryTypeSID:2,
+    ChannelSID : 2,
+    HouseNumber:" ",
+    NominalDuration: " ",
+    SegmentTypeSID: 2,
+    StartTime: " ",
+    EndTime: " ",
+    ActualDuration: " ",
+    ReferenceMediaLibrarySID: 2,
+    Previewed: false,
+    ValidDays: " ",
+    CreatedDate :" ",
+    ModifiedDate: " ",
+    IsDummy : false,
+    IsPlaceHolder : false,
+    BraodCasterID : " ",
+    BrandSID: 2,
+    ProductSID: 2,
+    PromoVersion: 3,
+    Reference1: " ",
+    Reference2: " ",
   };
 
   const [filter, setFilter] = useState();
@@ -51,13 +76,13 @@ const Interstial = () => {
   const loadInterstitials = async () => {
     await axios
       .get("http://142.93.214.96:9090/data/Interstitial/")
-      .then((res) => setInterstitials(res.data.entity));
+      .then((res) => setInterstitials(res.data));
   };
 
   const loadLanguages = async () => {
     await axios
       .get("http://142.93.214.96:9090/data/Language")
-      .then((res) => setLanguages(res.data.entity));
+      .then((res) => setLanguages(res.data));
   };
 
   useEffect(() => {
@@ -101,7 +126,7 @@ const Interstial = () => {
     <EditCommandCell
       {...props}
       enterEdit={enterEdit}
-      deleteGenre={deleteInterstitial}
+      deleteInterstitial={deleteInterstitial}
     />
   );
 
@@ -129,10 +154,18 @@ const Interstial = () => {
         onFilterChange={filterChange}
       >
         <GridColumn field="Description" title="Title" />
-        <GridColumn field="DubbedLanguage" title="DubbedLanguage" />
-        <GridColumn field="Duration" title="Duartion" />
-        <GridColumn field="GenreSID" title="Genre SID" />
-        <GridColumn field="TCOut" title="TC Out" />
+        <GridColumn field="ShortTitle" title="Short Title" />
+        <GridColumn field="ValidFromDate" title="Valid From" />
+        <GridColumn field="ExpiryDate" title="Valid To" />
+        <GridColumn field="TBA" title="TBA" />
+        <GridColumn field="HouseNumber" title="House Number" />
+        <GridColumn field="Reference1" title="Reference 1" />
+        <GridColumn field="Reference2" title="Reference 2" />
+        <GridColumn field="TBA" title="TBA" />
+        <GridColumn field="TBA" title="TBA" />
+        <GridColumn field="TBA" title="TBA" />
+        <GridColumn field="TBA" title="TBA" />
+        <GridColumn field="TBA" title="TBA" />
         <GridColumn title="Action" cell={MyEditCommandCell} />
       </Grid>
       {openForm && (
