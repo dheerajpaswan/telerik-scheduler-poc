@@ -6,8 +6,9 @@ import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Checkbox, Input, NumericTextBox } from "@progress/kendo-react-inputs";
 import { ComboBox, DropDownList } from "@progress/kendo-react-dropdowns";
 import { Error, Label } from "@progress/kendo-react-labels";
-import { DatePicker, TimePicker } from "@progress/kendo-react-dateinputs";
+import { DatePicker, DateTimePicker, TimePicker } from "@progress/kendo-react-dateinputs";
 import { TabStrip, TabStripTab } from "@progress/kendo-react-layout";
+import { DateTimePickerWithoutContext } from "@progress/kendo-react-dateinputs/dist/npm/datetimepicker/DateTimePicker";
 
 
 //min number validation functions for form
@@ -41,6 +42,7 @@ import { TabStrip, TabStripTab } from "@progress/kendo-react-layout";
 // };
 
 const InterstitialForm = (props) => {
+  console.log(props.item);
   const [value, setValue] = React.useState(0);
 
   //for the tabbar
@@ -67,11 +69,12 @@ const InterstitialForm = (props) => {
   //   console.log(e.value.SID);
   //   setValue(e.value.SID);
   // };
+  
 
   return (
     <div>
       <Dialog
-        title={props.item.SID !== 0 ? "Update" : " Create"}
+        title={props.item.SID > 0 ? "Update" : " Create"}
         onClose={props.cancelEdit}
         width={1400}
         height={700}
@@ -96,7 +99,7 @@ const InterstitialForm = (props) => {
                         {/* checkboxes to impliment & implement valid days pending*/}
                         <div className="row" style={{marginTop: "20px" , marginBottom:"0px"}}>
                           <div className="col-3" style={{marginLeft:"5px"}}><Field
-                          name={"SelectAll"}
+                          name={"ValidDays"}
                           component={Checkbox}
                           label={"Select All"}
                         /></div>
@@ -198,7 +201,7 @@ const InterstitialForm = (props) => {
                           <div className="col-4">
                             <Field
                               name={"ValidFromDate"}
-                              component={DatePicker}
+                              component={DateTimePicker}
                               label={"Valid From"}
                               marginTop={"100px"}
                               //   style={{ marginTop: "100px" }}
@@ -207,7 +210,7 @@ const InterstitialForm = (props) => {
                           <div className="col-4">
                             <Field
                               name={"ExpiryDate"}
-                              component={DatePicker}
+                              component={DateTimePicker}
                               label={"Valid To"}
                             />
                           </div>
