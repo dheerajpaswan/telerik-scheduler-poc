@@ -1,14 +1,15 @@
 //https://www.telerik.com/kendo-react-ui/components/layout/tabstrip/ -- to implement tab strip
-
-import React,{useState} from "react";
+//to convert time in hh:mm:ss:ff format -- https://stackoverflow.com/questions/42089868/converting-time-in-seconds-to-hhmmssff
+import React,{useEffect, useState} from "react";
 import { Dialog } from "@progress/kendo-react-dialogs";
 import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Checkbox, Input, NumericTextBox } from "@progress/kendo-react-inputs";
-import { ComboBox, DropDownList } from "@progress/kendo-react-dropdowns";
+import { DropDownList } from "@progress/kendo-react-dropdowns";
 import { Error, Label } from "@progress/kendo-react-labels";
-import { DatePicker, DateTimePicker, TimePicker } from "@progress/kendo-react-dateinputs";
+import { DateTimePicker, TimePicker } from "@progress/kendo-react-dateinputs";
 import { TabStrip, TabStripTab } from "@progress/kendo-react-layout";
-import { DateTimePickerWithoutContext } from "@progress/kendo-react-dateinputs/dist/npm/datetimepicker/DateTimePicker";
+import sampleData from "./sampleData.json";
+
 
 
 //min number validation functions for form
@@ -41,8 +42,45 @@ import { DateTimePickerWithoutContext } from "@progress/kendo-react-dateinputs/d
 //   );
 // };
 
+//to convert the data in hh:mm:ss:ff format
+var convertTime = function (input, fps) {
+  var pad = function(input) {return (input < 10) ? "0" + input : input;};
+  fps = (typeof fps !== 'undefined' ?  fps : 24 );
+  return [
+      pad(Math.floor(input / 3600)),
+      pad(Math.floor(input % 3600 / 60)),
+      pad(Math.floor(input % 60)),
+      pad(Math.floor(input * fps % fps))
+  ].join(':');
+}
+
+console.log(convertTime(13555.3515135));
+
+//timepicker component with format
+ const TimePickerWithFormat = (fieldRenderProps) => {
+    const { validationMessage, visited, ...others } = fieldRenderProps;
+    return (
+      <div>
+        <TimePicker {...others} format="HH:mm:ss" placeholder={"HH:mm:ss:ff"} />
+        {visited && validationMessage && <Error>{validationMessage}</Error>}
+      </div>
+    );
+  };
+
+  //datetimepicker component with format
+  const DateTimePickerWithFormat = (fieldRenderProps) => {
+    const { validationMessage, visited, ...others } = fieldRenderProps;
+    return (
+      <div>
+        <DateTimePicker {...others} format="yyyy-MM-dd HH:mm:ss" placeholder={"yyyy-MM-dd HH:mm:ss"} />
+        {visited && validationMessage && <Error>{validationMessage}</Error>}
+      </div>
+    );
+  };
+
 const InterstitialForm = (props) => {
-  console.log(props.item);
+  
+  // console.log(props.item);
   const [value, setValue] = React.useState(0);
 
   //for the tabbar
@@ -50,26 +88,13 @@ const InterstitialForm = (props) => {
   const handleSelect = (e) => {
     setSelected(e.selected);
   }
-  
+
 
   const handleSubmit = (e) => {
     console.log(props);
     props.onSubmit();
     console.log(e);
   }
-  //   props.languages.map((language, index) => {
-  //     alternateLanguageData.push(language.Description);
-  //     alternateLanguageSID.push(language.SID);
-  //   });
-
-  // console.log(alternateLanguageData);
-  // console.log(alternateLanguageSID);
-
-  // const onChange = (e) => {
-  //   console.log(e.value.SID);
-  //   setValue(e.value.SID);
-  // };
-  
 
   return (
     <div>
@@ -151,16 +176,41 @@ const InterstitialForm = (props) => {
                       <div className="col-6">
                         <div className="row">
                           <div className="col-4">
-                            <Field
-                              name={"Type"}
-                              component={DropDownList}
-                              label={"Type"}
-                            />
+                            {props.mediaCategoryTypes.data.map((obj) => {
+                              props.item.MediaCategoryTypeSID === obj.SID ? 
+                              (<Field
+                                name={"Type"}
+                                component={DropDownList}
+                                data={props.mediaCategoryTypes.data}
+                                textField={"Description"}
+                                // value={obj.Description}
+                                // defaultValue = {obj.Description}
+                                label={"Type"}
+                              />)
+                              :
+                              (<Field
+                                name={"Type"}
+                                component={DropDownList}
+                                data={props.mediaCategoryTypes.data}
+                                textField={"Description"}
+                                label={"Type"}
+                              />) 
+                              })
+                            }
+                            {/* <Field
+                                name={"Type"}
+                                component={DropDownList}
+                                data={props.mediaCategoryTypes.data}
+                                textField={"Description"}
+                                label={"Type"}
+                              /> */}
                           </div>
                           <div className="col-4">
                             <Field
                               name={"Content"}
                               component={DropDownList}
+                              data = {props.contents.data}
+                              textField = {"Description"}
                               label={"Content"}
                             />
                           </div>
@@ -182,6 +232,8 @@ const InterstitialForm = (props) => {
                             <Field
                               name={"Channel"}
                               component={DropDownList}
+                              data = {props.channels.data}
+                              textField = {"FullChannelName"}
                               label={"Channel"}
                             />
                           </div>
@@ -201,16 +253,15 @@ const InterstitialForm = (props) => {
                           <div className="col-4">
                             <Field
                               name={"ValidFromDate"}
-                              component={DateTimePicker}
+                              component={DateTimePickerWithFormat}
                               label={"Valid From"}
                               marginTop={"100px"}
-                              //   style={{ marginTop: "100px" }}
                             />
                           </div>
                           <div className="col-4">
                             <Field
                               name={"ExpiryDate"}
-                              component={DateTimePicker}
+                              component={DateTimePickerWithFormat}
                               label={"Valid To"}
                             />
                           </div>
@@ -219,7 +270,6 @@ const InterstitialForm = (props) => {
                               name={"TBA"}
                               component={Checkbox}
                               label={"TBA"}
-                              // marginTop={"400px"}
                             />
                           </div>
                         </div>
@@ -229,7 +279,7 @@ const InterstitialForm = (props) => {
                           <div className="col-6">
                             <Field
                               name={"NominalDuration"}
-                              component={TimePicker}
+                              component={TimePickerWithFormat}
                               label={"Nominal Duration"}
                             />
                           </div>
@@ -250,6 +300,8 @@ const InterstitialForm = (props) => {
                             <Field
                               name={"Genre"}
                               component={DropDownList}
+                              data = {props.genres.data}
+                              textField = {"Description"}
                               label={"Genre"}
                             />
                           </div>
@@ -257,6 +309,8 @@ const InterstitialForm = (props) => {
                             <Field
                               name={"SubGenre"}
                               component={DropDownList}
+                              data = {props.genres.data}
+                              textField = {"Description"}
                               label={"Sub Genre"}
                             />
                           </div>
@@ -267,14 +321,14 @@ const InterstitialForm = (props) => {
                           <div className="col-6">
                             <Field
                               name={"StartTime"}
-                              component={TimePicker}
+                              component={TimePickerWithFormat}
                               label={"In Time"}
                             />
                           </div>
                           <div className="col-6">
                             <Field
                               name={"EndTime"}
-                              component={TimePicker}
+                              component={TimePickerWithFormat}
                               label={"Out Time"}
                             />
                           </div>
@@ -305,7 +359,7 @@ const InterstitialForm = (props) => {
                           <div className="col-6">
                             <Field
                               name={"ActualDuration"}
-                              component={TimePicker}
+                              component={TimePickerWithFormat}
                               label={"Actual Duration"}
                             />
                           </div>
@@ -325,6 +379,8 @@ const InterstitialForm = (props) => {
                           <div className="col-4">
                             <Field
                               name={"Version"}
+                              data = {props.promoVersions.data}
+                              textField = {"Name"}
                               component={DropDownList}
                               label={"Version"}
                             />

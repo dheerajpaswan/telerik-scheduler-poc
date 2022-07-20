@@ -31,55 +31,91 @@ const Interstial = () => {
     Description: " ",
     ShortTitle: " ",
     TBA: false,
-    GenreSID : 2,
-    SubGenreSID : 3,
     ProductionYear: 0,
     Available: false,
-    MediaCategorySID: 2,
-    ContentSID : 2,
-    MediaCategoryTypeSID:2,
-    ChannelSID : 2,
     HouseNumber:" ",
-    SegmentTypeSID: 2,
-    ReferenceMediaLibrarySID: 2,
     Previewed: false,
     ValidDays: " ",
     IsDummy : false,
     IsPlaceHolder : false,
     BroadCasterID : " ",
-    BrandSID: 2,
-    ProductSID: 2,
-    PromoVersionSID: 3,
     Reference1: " ",
     Reference2: " ",
   };
 
   const [filter, setFilter] = useState();
   const [languages, setLanguages] = useState([]);
+  const [mediaCategoryTypes,setMediaCategoryTypes] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [promoVersions, setPromoVersions] = useState([]);
+  const [contents, setContents] = useState([]);
+  const [channels, setChannels] = useState([]);
   const [interstitials, setInterstitials] = useState([]);
   const [openForm, setOpenForm] = useState(false);
   const [editInterstitial, setEditInterstitial] = useState(initialValues);
+
 
   const filterChange = (event) => {
     setInterstitials(filterBy(interstitials, event.filter));
     setFilter(event.filter);
   };
+  
+  //TODO: make it DRY to load data from the table via API
+  const loadData = async(tableName) => {
+    const result = await axios.get(`http://142.93.214.96:9090/data/${tableName}/`)
+    const data = result.data;
+    return data;
+  }
 
-  //to load data from the table via API
+  const loadChannels = async () => {
+    await axios
+    .get("http://142.93.214.96:9090/data/Channel")
+    .then((res) => setChannels(res.data));
+  };
+  const loadContents = async () => {
+    await axios
+    .get("http://142.93.214.96:9090/data/Content")
+    .then((res) => setContents(res.data));
+  };
+  const loadPromoVersions = async () => {
+    await axios
+    .get("http://142.93.214.96:9090/data/PromoVersion")
+    .then((res) => setPromoVersions(res.data));
+  };
+
   const loadInterstitials = async () => {
     await axios
-      .get("http://142.93.214.96:9090/data/Interstitial/")
-      .then((res) => setInterstitials(res.data));
+    .get("http://142.93.214.96:9090/data/Interstitial/")
+    .then((res) => setInterstitials(res.data));
   };
 
+  
+  const loadMediaCategoryTypes = async () => {
+    await axios
+    .get("http://142.93.214.96:9090/data/MediaCategoryType")
+    .then((res) => setMediaCategoryTypes(res.data));
+  };
+
+  const loadGenres = async () => {
+    await axios
+    .get("http://142.93.214.96:9090/data/Genre")
+    .then((res) => setGenres(res.data));
+  };
+  
   const loadLanguages = async () => {
     await axios
-      .get("http://142.93.214.96:9090/data/Language")
-      .then((res) => setLanguages(res.data));
+    .get("http://142.93.214.96:9090/data/Language")
+    .then((res) => setLanguages(res.data));
   };
-
+  
+  
   useEffect(() => {
     loadInterstitials();
+    loadGenres();
+    loadChannels();
+    loadContents();
+    loadPromoVersions();
+    loadMediaCategoryTypes();
     loadLanguages();
   }, [setInterstitials]);
 
@@ -111,14 +147,14 @@ const Interstial = () => {
       return date;
     }else{
     const date = new Date(eventDate);
-    console.log(eventDate.length);
     return date;
     }
   };
   //to open the form to create or update enitity
   const enterEdit = (item) => {
+    console.log(item);
     setOpenForm(true);
-    setEditInterstitial({...item,
+    setEditInterstitial({...item, 
       TBA : item.TBA === 1 ? true : false,
       Previewed : item.Previewed === 1 ? true : false,
       Available : item.Available === 1 ? true : false,
@@ -149,9 +185,11 @@ const Interstial = () => {
 
 //to submit data in datatable
   const handleSubmit = async (event) => {
-    //add selectall here
+    //add selectall here & this is for other column implementation-->  ...event,
     const data = {
-      data: {...event,
+      data: {
+        Description: event.Description,
+        ShortTitle : event.ShortTitle,
         //format conversion for post
         ValidFromDate : datetimeFormat(event.ValidFromDate),
         ExpiryDate : datetimeFormat(event.ExpiryDate),
@@ -162,13 +200,13 @@ const Interstial = () => {
         Available : event.Available,
         Previewed : event.Previewed,
         TBA : event.TBA,
-        GenreSID : 2,
-        SubGenreSID : 3,
+        GenreSID : event.Genre.SID,
+        SubGenreSID : event.SubGenre.SID,
         ProductionYear: parseInt(event.ProductionYear),
-        MediaCategorySID: 2,
-        ContentSID : 2,
-        MediaCategoryTypeSID:2,
-        ChannelSID : 2,
+        MediaCategorySID: 2, //hardcoded
+        ContentSID : event.Content.SID,
+        MediaCategoryTypeSID:event.Type.SID,  //dropdown binding
+        ChannelSID : event.Channel.SID,
         HouseNumber:event.HouseNumber,
         SegmentTypeSID: 2,
         ReferenceMediaLibrarySID: 2,
@@ -179,7 +217,9 @@ const Interstial = () => {
         IsPlaceHolder : false,
         BrandSID: 2,
         ProductSID: 2,
-        PromoVersionSID: 3,
+        PromoVersionSID: event.Version.SID,
+        Reference1:event.Reference1,
+        Reference2:event.Reference2
       },
     };
     console.log(data.data);
@@ -247,6 +287,11 @@ const Interstial = () => {
           onSubmit={handleSubmit}
           item={editInterstitial}
           languages={languages}
+          promoVersions={promoVersions}
+          genres={genres}
+          contents={contents}
+          channels={channels}
+          mediaCategoryTypes={mediaCategoryTypes}
         />
       )}
     </>
