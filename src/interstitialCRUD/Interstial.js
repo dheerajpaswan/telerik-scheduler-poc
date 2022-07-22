@@ -54,6 +54,10 @@ const Interstial = () => {
   const [openForm, setOpenForm] = useState(false);
   const [editInterstitial, setEditInterstitial] = useState(initialValues);
 
+  //sample for load function
+  const [load,setLoad] = useState([]);
+
+
   const filterChange = (event) => {
     setInterstitials(filterBy(interstitials, event.filter));
     setFilter(event.filter);
@@ -67,6 +71,8 @@ const Interstial = () => {
     const data = result.data;
     return data;
   };
+
+
 
   const loadChannels = async () => {
     await axios
@@ -108,7 +114,14 @@ const Interstial = () => {
       .then((res) => setLanguages(res.data));
   };
 
+  console.log(load);
   useEffect(() => {
+    //sample of single loading function
+    const fetchData = loadData("Channel").then(function(result) {
+      setLoad(result.data);
+   console.log(result) // "Some User token"
+  })
+  console.log(fetchData);
     loadInterstitials();
     loadGenres();
     loadChannels();
@@ -280,9 +293,9 @@ const Interstial = () => {
         <GridColumn field="HouseNumber" title="House Number" />
         <GridColumn field="Reference1" title="Reference 1" />
         <GridColumn field="Reference2" title="Reference 2" />
-        <GridColumn field="StartTime" title="Start Time" />
-        <GridColumn field="EndTime" title="End Time" />
-        <GridColumn field="Previewed" title="Previewed" />
+        <GridColumn field="StartTime" title="Start Time" format="{0:hh:mm:ss.SSS}" />
+        <GridColumn field="EndTime" title="End Time" format="{0:hh:mm:ss.SSS}" />
+        <GridColumn field="Previewed" title="Previewed" format="{0:hh:mm:ss.SSS}"/>
         <GridColumn field="Available" title="Available" />
         <GridColumn field="ProductionYear" title="Production Year" />
         <GridColumn title="Action" cell={MyEditCommandCell} />
